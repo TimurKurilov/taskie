@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Taskie</title>
 
-  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // добавим кастомный цвет
     tailwind.config = {
       theme: {
         extend: {
@@ -22,14 +20,10 @@
 </head>
 <body class="bg-gray-100 text-black">
 
-  <!-- NAVBAR -->
   <nav class="flex items-center justify-between px-6 py-4 bg-navbar border-b border-gray-700 text-white">
-    <!-- Лого -->
     <div class="text-xl font-bold">Taskie</div>
 
-    <!-- Иконки справа -->
     <div class="flex items-center gap-5">
-      <!-- Уведомления -->
       <button class="text-gray-400 hover:text-white" title="Notifications">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
              viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -38,7 +32,6 @@
         </svg>
       </button>
 
-      <!-- Переключатель темы -->
       <button class="text-gray-400 hover:text-white" title="Toggle Theme">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
              viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -47,13 +40,16 @@
         </svg>
       </button>
 
-      <!-- Аватар -->
-      <img class="w-8 h-8 rounded-full border border-gray-600"
-           src="https://www.gravatar.com/avatar/?d=mp"
-           alt="User avatar" />
+      {% if user.is_authenticated %}
+        <img class="w-8 h-8 rounded-full border border-gray-600"
+            src="https://www.gravatar.com/avatar/?d=mp"
+            alt="User avatar" />
+      {% else %}
+        <a href="/auth/login/">Log in</a>
+        <a href="/auth/register/">Register</a>
+      {% endif %}
     </div>
   </nav>
 
-  <!-- Остальной контент -->
   <div class="p-6">
     <p class="text-gray-700">Тут будет осн

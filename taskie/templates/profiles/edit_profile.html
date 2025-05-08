@@ -1,0 +1,9 @@
+<div class="edit-profile-form">
+    <h2>Редактировать профиль: {{ username }}</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Сохранить</button>
+    </form>
+</div>
+

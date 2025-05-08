@@ -1,0 +1,9 @@
+<div class="profile-container">
+    <h2>Профиль: {{ user.username }}</h2>
+    <p><strong>Тип:</strong> {{ user_profile.type }}</p>
+    <p><strong>О себе:</strong></p>
+    <p>{{ user_profile.bio|linebreaks }}</p>
+    {% if user == request.user %}
+        <a href="/profile/{{user.username}}/edit/">Редактировать профиль</a>
+    {% endif %}
+</div>
