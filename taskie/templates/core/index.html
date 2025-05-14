@@ -41,9 +41,11 @@
       </button>
 
       {% if user.is_authenticated %}
-        <img class="w-8 h-8 rounded-full border border-gray-600"
-            src="https://www.gravatar.com/avatar/?d=mp"
-            alt="User avatar" />
+        <a href="/profile/{{ user.username }}">
+          <img class="w-8 h-8 rounded-full border border-gray-600"
+          src="https://www.gravatar.com/avatar/?d=mp"
+          alt="User avatar" />
+        </a>
       {% else %}
         <a href="/auth/login/">Log in</a>
         <a href="/auth/register/">Register</a>
