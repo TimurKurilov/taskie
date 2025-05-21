@@ -6,5 +6,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.mainpage, name="mainpage"),
     path('auth/', include('users.urls', namespace='auth')),
+    path('tasks/', include('tasks.urls', namespace='tasks')),
     path("profile/", include(("profiles.urls", "profiles"), namespace="profiles"))
 ]

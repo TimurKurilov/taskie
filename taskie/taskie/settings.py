@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['web', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'tasks.apps.TasksConfig',
     'profiles.apps.ProfilesConfig',
     'users.apps.UsersConfig',
     'core.apps.CoreConfig',
