@@ -1,25 +1,35 @@
-  <div class="task-list-container">
-    <h1>Task List</h1>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/task_list.css' %}">
 
-    {% if tasks %}
-      <ul class="task-list">
-        {% for task in tasks %}
-          <li class="task-item{% if task.is_completed %} completed{% endif %}">
-            <h2>{{ task.title }}</h2>
-            <p><strong>Description:</strong> {{ task.description }}</p>
-            <p><strong>Created:</strong> {{ task.created_at|date:"Y-m-d H:i" }}</p>
-            <p><strong>Due:</strong> {{ task.due_date }}</p>
-            <p><strong>Status:</strong> 
-              {% if task.is_completed %}
-                ✅ Completed
-              {% else %}
-                ❌ Not completed
-              {% endif %}
-            </p>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>No tasks found.</p>
-    {% endif %}
+<div class="leet-task-table">
+  <div class="leet-task-row header">
+    <span>#</span>
+    <span>Title & Description</span>
+    <span>Created</span>
+    <span>Due</span>
+    <span>Status</span>
   </div>
+
+  {% if tasks %}
+    {% for task in tasks %}
+      <div class="leet-task-row{% if task.is_completed %} completed{% endif %}">
+        <span>{{ forloop.counter }}</span>
+        <span>
+          <div class="task-title">{{ task.title }}</div>
+          <div class="task-desc">{{ task.description|truncatewords:10 }}</div>
+        </span>
+        <span>{{ task.created_at|date:"Y-m-d" }}</span>
+        <span>{{ task.due_date }}</span>
+        <span>
+          {% if task.is_completed %}
+            ✅
+          {% else %}
+            ❌
+          {% endif %}
+        </span>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="no-tasks">No tasks found.</p>
+  {% endif %}
+</div>

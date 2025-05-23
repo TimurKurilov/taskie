@@ -1,3 +1,5 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/task_create.css' %}">
 <h2>Create New Task</h2>
 <form method="post">
     {% csrf_token %}
