@@ -1,11 +1,26 @@
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/edit_profiles.css' %}">
+<link rel="stylesheet" href="{% static 'css/profiles_edit.css' %}">
+
 <div class="edit-profile-form">
     <h2>Редактировать профиль: {{ username }}</h2>
     <form method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
+        
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">Имя профиля:</label>
+            {{ form.title }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">О себе:</label>
+            {{ form.description }}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.due_date.id_for_label }}">Дата:</label>
+            {{ form.due_date }}
+        </div>
+
         <button type="submit">Сохранить</button>
     </form>
 </div>
-
