@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import TasksForm
 from .models import Tasks
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 
 @login_required
 def task_create_view(request):
@@ -11,7 +12,7 @@ def task_create_view(request):
             task = form.save(commit=False)
             task.user = request.user
             task.save()
-            return redirect("task_list")
+            return redirect("/tasks/")
     else:
         form = TasksForm()
     
@@ -21,3 +22,7 @@ def task_create_view(request):
 def task_list(request):
     tasks = Tasks.objects.all()
     return render(request, "tasks/task_list.html", {"tasks": tasks})
+
+def task_info(request, id):
+    task = get_object_or_404(Tasks, id=id)
+    return render(request, "tasks/task_info.html", {"task": task})

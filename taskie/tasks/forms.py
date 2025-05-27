@@ -3,14 +3,12 @@ from .models import Tasks
 
 class TasksForm(forms.ModelForm):
     due_date = forms.DateField(
-        input_formats=["%d.%m.%Y"],
-        widget=forms.DateInput(
-            attrs={
-                "type": "date",
-                "class": "form-control",
-                "placeholder": "дд.мм.гггг"
-            }
-        )
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control'
+        }),
+        input_formats=['%d.%m.%Y', '%Y-%m-%d'],
+        help_text="Введите дату в формате ДД.ММ.ГГГГ или выберите в календаре"
     )
 
     class Meta:

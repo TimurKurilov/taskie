@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ task.title }}</title>
+</head>
+<body>
+    <div class="task-container">
+        <h1>{{ task.title }}</h1>
+        <p>{{ task.description }}</p>
+
+        {% if task.created_at %}
+        <div class="date">Created at: {{ task.created_at }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>

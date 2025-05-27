@@ -20,6 +20,7 @@
         </span>
         <span>{{ task.created_at|date:"Y-m-d" }}</span>
         <span>{{ task.due_date }}</span>
+        <span>{{ task.user }}</span>
         <span>
           {% if task.is_completed %}
             ✅
