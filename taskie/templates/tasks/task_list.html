@@ -3,32 +3,35 @@
 
 <div class="leet-task-table">
   <div class="leet-task-row header">
-    <span>#</span>
-    <span>Title & Description</span>
-    <span>Created</span>
-    <span>Due</span>
-    <span>Status</span>
+    <div class="cell index">#</div>
+    <div class="cell title-desc">Title & Description</div>
+    <div class="cell created">Created</div>
+    <div class="cell due">Due</div>
+    <div class="cell user">User</div>
+    <div class="cell status">Status</div>
   </div>
 
   {% if tasks %}
     {% for task in tasks %}
-      <div class="leet-task-row{% if task.is_completed %} completed{% endif %}">
-        <span>{{ forloop.counter }}</span>
-        <span>
-          <div class="task-title">{{ task.title }}</div>
-          <div class="task-desc">{{ task.description|truncatewords:10 }}</div>
-        </span>
-        <span>{{ task.created_at|date:"Y-m-d" }}</span>
-        <span>{{ task.due_date }}</span>
-        <span>{{ task.user }}</span>
-        <span>
-          {% if task.is_completed %}
-            ✅
-          {% else %}
-            ❌
-          {% endif %}
-        </span>
-      </div>
+      <a href="http://localhost/tasks/{{ task.id }}" class="task-link">
+        <div class="leet-task-row{% if task.is_completed %} completed{% endif %}">
+          <div class="cell index">{{ forloop.counter }}</div>
+          <div class="cell title-desc">
+            <div class="task-title">{{ task.title }}</div>
+            <div class="task-desc">{{ task.description|truncatewords:10 }}</div>
+          </div>
+          <div class="cell created">{{ task.created_at|date:"Y-m-d" }}</div>
+          <div class="cell due">{{ task.due_date }}</div>
+          <div class="cell user">{{ task.user }}</div>
+          <div class="cell status">
+            {% if task.is_completed %}
+              ✅
+            {% else %}
+              ❌
+            {% endif %}
+          </div>
+        </div>
+      </a>
     {% endfor %}
   {% else %}
     <p class="no-tasks">No tasks found.</p>

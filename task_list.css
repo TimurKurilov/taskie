@@ -1,0 +1,59 @@
+body {
+  background-color: #121212;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.leet-task-table {
+  max-width: 1000px;
+  margin: 40px auto;
+  font-size: 0.95rem;
+}
+
+.leet-task-row {
+  display: grid;
+  grid-template-columns: 40px 1.5fr 120px 120px 100px 80px; /* Исправлено: добавлены все 6 колонок */
+  padding: 14px 18px;
+  border-bottom: 1px solid #333;
+  align-items: start;
+  transition: background 0.2s ease;
+}
+
+.leet-task-row.header {
+  font-weight: bold;
+  color: #aaa;
+  border-bottom: 2px solid #555;
+}
+
+.leet-task-row:hover {
+  background-color: #1e1e1e;
+}
+
+.leet-task-row.completed {
+  opacity: 0.6;
+}
+
+.task-title {
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.task-desc {
+  color: #bbb;
+  font-size: 0.85rem;
+}
+
+.no-tasks {
+  text-align: center;
+  margin-top: 40px;
+  font-style: italic;
+  color: #777;
+}
+
+
+
+
+
