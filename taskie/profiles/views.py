@@ -1,8 +1,9 @@
 from .models import Profile
 from .forms import ProfileForm
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from django.contrib import messages
 
 def profile(request, username):
     user = User.objects.get(username=username)
@@ -17,9 +18,17 @@ def edit_profile(request, username):
         return render(request, "profiles/access_denied.html")
     
     if request.method == "POST":
-        form = ProfileForm(request.POST, instance=user_profile)
+        form = ProfileForm(request.POST, request.FILES, instance=user_profile)
         if form.is_valid():
             form.save()
+            messages.success(request, "Профиль успешно обновлен")
+            return redirect('profile', username=username)
+        else:
+            messages.error(request, "Пожалуйста, исправьте ошибки в форме")
     else:
         form = ProfileForm(instance=user_profile)
-    return render(request, "profiles/edit_profile.html", {"form": form, "username": username})
+    
+    return render(request, "profiles/edit_profile.html", {
+        "form": form, 
+        "username": username
+    })

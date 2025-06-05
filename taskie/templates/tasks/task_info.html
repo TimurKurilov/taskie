@@ -1,16 +1,18 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>{{ task.title }}</title>
+    <link rel="stylesheet" href="{% static 'css/task_info.css' %}">
 </head>
 <body>
     <div class="task-container">
         <h1>{{ task.title }}</h1>
-        <p>{{ task.description }}</p>
+        <p class="description">{{ task.description }}</p>
 
         {% if task.created_at %}
-        <div class="date">Created at: {{ task.created_at }}</div>
+        <div class="date">Создано: {{ task.created_at|date:"d.m.Y H:i" }}</div>
         {% endif %}
     </div>
 </body>

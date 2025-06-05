@@ -1,26 +1,41 @@
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/profiles_edit.css' %}">
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.username }}</title>
+    <link rel="stylesheet" href="{% static 'css/edit.css' %}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Редактировать профиль: george</h2>
 
-<div class="edit-profile-form">
-    <h2>Редактировать профиль: {{ username }}</h2>
-    <form method="POST">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <label for="{{ form.title.id_for_label }}">Имя профиля:</label>
-            {{ form.title }}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            Профиль успешно обновлен!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
         </div>
 
-        <div class="form-group">
-            <label for="{{ form.description.id_for_label }}">О себе:</label>
-            {{ form.description }}
-        </div>
+        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <p>
+                <label for="type">Type:</label>
+                <select id="type" name="type">
+                    <option value="Заказчик">Заказчик</option>
+                    <option value="Исполнитель">Исполнитель</option>
+                </select>
+            </p>
+            
+            <p>
+                <label for="bio">Bio:</label>
+                <textarea id="bio" name="bio" rows="5">Это текст биографии пользователя, который можно редактировать.</textarea>
+                <span class="helptext">Расскажите немного о себе</span>
+            </p>
 
-        <div class="form-group">
-            <label for="{{ form.due_date.id_for_label }}">Дата:</label>
-            {{ form.due_date }}
-        </div>
-
-        <button type="submit">Сохранить</button>
-    </form>
-</div>
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            <a href="/profile/{{ user.username }}" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
+</body>
+</html>

@@ -32,9 +32,8 @@ def task_info(request, id):
 def task_edit(request, id):
     task = get_object_or_404(Tasks, id=id)
 
-    # Проверяем, что текущий пользователь — владелец задачи
     if task.user != request.user:
-        return redirect("/tasks/")  # Или верните 403
+        return redirect("/tasks/")
 
     if request.method == "POST":
         form = TasksForm(request.POST, instance=task)
