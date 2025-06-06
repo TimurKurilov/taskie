@@ -1,4 +1,7 @@
+{% extends "base.html" %}
 {% load static %}
+
+{% block title %}{{user.username}}{% endblock %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -8,6 +11,7 @@
     <link rel="stylesheet" href="{% static 'css/edit.css' %}">
 </head>
 <body>
+    {% block content %}
     <div class="container mt-5">
         <h2 class="mb-4">Редактировать профиль: george</h2>
 
@@ -37,5 +41,6 @@
             <a href="/profile/{{ user.username }}" class="btn btn-secondary">Отмена</a>
         </form>
     </div>
+    {% endblock content %}
 </body>
 </html>

@@ -1,4 +1,7 @@
+{% extends "base.html" %}
 {% load static %}
+
+{% block title %}{{task.title}}{% endblock %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -7,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/task_info.css' %}">
 </head>
 <body>
+    {% block content %}
     <div class="task-container">
         <h1>{{ task.title }}</h1>
         <p class="description">{{ task.description }}</p>
@@ -15,5 +19,6 @@
         <div class="date">Создано: {{ task.created_at|date:"d.m.Y H:i" }}</div>
         {% endif %}
     </div>
+    {% endblock content %}
 </body>
 </html>

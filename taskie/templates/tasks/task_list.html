@@ -1,4 +1,9 @@
+{% extends "base.html" %}
 {% load static %}
+
+{% block title %}Задачи{% endblock %}
+
+{% block content %}
 <link rel="stylesheet" href="{% static 'css/task_list.css' %}">
 
 <div class="leet-task-table">
@@ -37,3 +42,4 @@
     <p class="no-tasks">No tasks found.</p>
   {% endif %}
 </div>
+{% endblock %}

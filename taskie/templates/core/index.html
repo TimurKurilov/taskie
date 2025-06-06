@@ -1,106 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Taskie</title>
+{% extends "base.html" %}
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            navbar: "#191819",
-          },
-        },
-      },
-    };
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-  <style>
-    body {
-      background-color: #191819;
-      color: #ffffff;
-    }
-    .header-container {
-      background-color: #191819;
-      padding: 2.5rem 1.25rem;
-      text-align: center;
-    }
-    .main-header {
-      font-family: 'Inter', sans-serif;
-      font-size: 3.5rem;
-      font-weight: 900;
-      line-height: 1.2;
-      color: #ffffff;
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
-    .sub-header {
-      font-family: 'Inter', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 400;
-      line-height: 1.5;
-      color: #cccccc;
-      max-width: 800px;
-      margin: 0 auto;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
+{% block title %}Главная{% endblock %}
 
-  <nav class="flex items-center justify-between px-6 py-4 bg-navbar border-b border-gray-700 text-white">
-    <a href="localhost/"><div class="text-xl font-bold">Taskie</div></a>
-
-    <div class="flex items-center gap-5">
-      <!-- Ссылка на список задач /tasks/ -->
-      <a href="/tasks/" class="text-gray-400 hover:text-white" title="Список задач">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-             viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
-      </a>
-
-      <!-- Ссылка на создание задачи /tasks/create/ -->
-      <a href="/tasks/create/" class="text-gray-400 hover:text-white" title="Создать задачу">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-             viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M12 4v16m8-8H4" />
-        </svg>
-      </a>
-
-      {% if user.is_authenticated %}
-        <a href="/profile/{{ user.username }}">
-          <img class="w-8 h-8 rounded-full border border-gray-600"
-          src="https://www.gravatar.com/avatar/?d=mp"
-          alt="User avatar" />
-        </a>
-      {% else %}
-        <a href="/auth/login/">Log in</a>
-        <a href="/auth/register/">Register</a>
-      {% endif %}
-    </div>
-  </nav>
-
-  <!-- Новый заголовок -->
-  <div class="header-container">
-    <div class="main-header">
-      МИКРО-МАРКЕТПЛЕЙС ЗАДАЧ ДЛЯ РАЗРАБОТЧИКОВ
-    </div>
-    <div class="sub-header">
+{% block content %}
+  <div class="header-container text-center py-10">
+    <div class="main-header text-5xl font-extrabold">МИКРО-МАРКЕТПЛЕЙС ЗАДАЧ ДЛЯ РАЗРАБОТЧИКОВ</div>
+    <div class="sub-header text-lg text-gray-400 max-w-2xl mx-auto mt-4">
       Простые задачи — быстрые решения. Платформа, объединяющая тех, кому нужно быстро решить конкретную проблему, и тех, кто хочет применить свои навыки в деле.
     </div>
   </div>
-
-  <div class="p-6">
-    <!-- Здесь будет основной контент -->
-  </div>
-
-</body>
-</html>
+{% endblock %}

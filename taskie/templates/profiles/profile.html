@@ -1,5 +1,8 @@
+{% extends "base.html" %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/profiles.css' %}">
+{% block title %}{{user.username}}{% endblock %}
+{% block content %}
 <div class="profile-container">
     <h2>Профиль: {{ user.username }}</h2>
     <p><strong>Тип:</strong> {{ user_profile.type }}</p>
@@ -8,4 +11,5 @@
     {% if user == request.user %}
         <a href="/profile/{{user.username}}/edit/">Редактировать профиль</a>
     {% endif %}
+    {% endblock content %}
 </div>
