@@ -1,52 +1,97 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Register - Taskie{% endblock %}
+{% block title %}Регистрация{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/auth_styles.css' %}">
+  <link rel="stylesheet" href="{% static 'css/auth_styles.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="auth-container">
-  <div class="auth-header">
-    <h2>Register</h2>
-  </div>
-  
-  <form method="post" class="auth-form">
-    {% csrf_token %}
-    
-    {% if form.non_field_errors %}
-      <ul class="errorlist">
-        {% for error in form.non_field_errors %}
-          <li>{{ error }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-    
-    {% for field in form %}
-      <div class="form-group">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {% if field.help_text %}
-          <span class="helptext">{{ field.help_text }}</span>
-        {% endif %}
-        {% if field.errors %}
-          <ul class="errorlist">
-            {% for error in field.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
+  <div class="auth-container register-container">
+    <div class="auth-card register-card">
+      <div class="auth-header">
+        <h1 class="auth-title register-title">Регистрация</h1>
+        <p class="auth-subtitle">Создайте аккаунт для использования Taskie</p>
       </div>
-    {% endfor %}
-    
-    <button type="submit" class="auth-button">Register</button>
-  </form>
-  
-  <div class="auth-links">
-    Already have an account? <a href="/auth/login/">Log in</a>
-  </div>
-</div>
-{% endblock %}
 
+      <form class="auth-form register-form" method="post" action="/auth/register/">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label class="form-label" for="id_username">Имя пользователя</label>
+          <input class="form-input" type="text" id="id_username" name="username" placeholder="Введите имя пользователя" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_password1">Пароль</label>
+          <input class="form-input" type="password" id="id_password1" name="password1" placeholder="Введите пароль" required>
+          <p class="password-requirements">Пароль должен содержать минимум 8 символов, включая буквы и цифры</p>
+          <div class="password-strength">
+            <div class="password-strength-bar"></div>
+            <div class="password-strength-bar"></div>
+            <div class="password-strength-bar"></div>
+            <div class="password-strength-bar"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_password2">Подтверждение пароля</label>
+          <input class="form-input" type="password" id="id_password2" name="password2" placeholder="Повторите пароль" required>
+          <div class="form-error" id="password-match-error" style="display: none;">
+            Пароли не совпадают
+          </div>
+        </div>
+
+        <button type="submit" class="auth-button register-button">Зарегистрироваться</button>
+      </form>
+
+      <div class="register-footer">
+        <p>Уже есть аккаунт? <a href="/auth/login/">Войти</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const passwordInput = document.getElementById("id_password1");
+    const confirmPasswordInput = document.getElementById("id_password2");
+    const strengthBars = document.querySelectorAll(".password-strength-bar");
+    const passwordMatchError = document.getElementById("password-match-error");
+
+    passwordInput.addEventListener("input", function () {
+      const password = this.value;
+      let strength = 0;
+
+      if (password.length >= 8) strength++;
+      if (password.match(/[A-Z]/)) strength++;
+      if (password.match(/[0-9]/)) strength++;
+      if (password.match(/[^A-Za-z0-9]/)) strength++;
+
+      strengthBars.forEach((bar, index) => {
+        bar.className = "password-strength-bar";
+        if (index < strength) {
+          if (strength <= 2) bar.classList.add("weak");
+          else if (strength === 3) bar.classList.add("medium");
+          else bar.classList.add("strong");
+        }
+      });
+
+      checkPasswordMatch();
+    });
+
+    confirmPasswordInput.addEventListener("input", checkPasswordMatch);
+
+    function checkPasswordMatch() {
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+
+      if (confirmPassword && password !== confirmPassword) {
+        passwordMatchError.style.display = "block";
+        confirmPasswordInput.classList.add("error");
+      } else {
+        passwordMatchError.style.display = "none";
+        confirmPasswordInput.classList.remove("error");
+      }
+    }
+  </script>
+{% endblock content %}
