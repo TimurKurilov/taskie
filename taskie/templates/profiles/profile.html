@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/profiles.css' %}">
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/profiles.css' %}">
+{% endblock %}
 {% block title %}{{user.username}}{% endblock %}
 {% block content %}
 <div class="profile-container">

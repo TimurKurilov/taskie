@@ -56,13 +56,14 @@
       {% if user.is_authenticated %}
         <a href="/profile/{{ user.username }}">
           <img class="w-8 h-8 rounded-full border border-gray-600"
-               src="https://www.gravatar.com/avatar/?d=mp"
+               src="https://www.gravatar.com/avatar/{{ user.email|default:"" |urlencode }}?d=mp"
                alt="User avatar" />
         </a>
       {% else %}
-        <a href="/auth/login/">Log in</a>
-        <a href="/auth/register/">Register</a>
+        <a href="/auth/login/" class="text-gray-400 hover:text-white">Log in</a>
+        <a href="/auth/register/" class="text-gray-400 hover:text-white">Register</a>
       {% endif %}
+
     </div>
   </nav>
 

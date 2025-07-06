@@ -2,12 +2,13 @@
 {% load static %}
 
 {% block title %}{{task.title}}{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/task_info.css' %}">
+{% endblock %} 
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{{ task.title }}</title>
-    <link rel="stylesheet" href="{% static 'css/task_info.css' %}">
 </head>
 <body>
     {% block content %}
