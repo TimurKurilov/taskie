@@ -18,28 +18,45 @@
 
   {% if tasks %}
     {% for task in tasks %}
-      <a href="http://localhost/tasks/{{ task.id }}" class="task-link">
+      {% if not task.is_completed %}
         <div class="leet-task-row{% if task.is_completed %} completed{% endif %}">
-          <div class="cell index">{{ forloop.counter }}</div>
+          <div class="cell index"><a href="{{ task.id }}" class="task-link">{{ forloop.counter }}</a></div>
           <div class="cell title-desc">
-            <div class="task-title">{{ task.title }}</div>
-            <div class="task-desc">{{ task.description|truncatewords:10 }}</div>
+            <a href="{{ task.id }}" class="task-link">
+              <div class="task-title">{{ task.title }}</div>
+              <div class="task-desc">{{ task.description|truncatewords:10 }}</div>
+            </a>
           </div>
           <div class="cell created">{{ task.created_at|date:"Y-m-d" }}</div>
           <div class="cell due">{{ task.due_date }}</div>
           <div class="cell user">{{ task.user }}</div>
-          <div class="cell status">
-            {% if task.is_completed %}
-              ✅
-            {% else %}
-              ❌
-            {% endif %}
-          </div>
+          <div class="cell status">❌</div>
         </div>
-      </a>
+      {% endif %}
     {% endfor %}
   {% else %}
-    <p class="no-tasks">No tasks found.</p>
+    <p>No tasks available.</p>
+  {% endif %}
+  {% if tasks %}
+    {% for task in tasks %}
+      {% if task.is_completed %}
+        <div class="leet-task-row{% if task.is_completed %} completed{% endif %}">
+          <div class="cell index"><a href="{{ task.id }}" class="task-link">{{ forloop.counter }}</a></div>
+          <div class="cell title-desc">
+            <a href="{{ task.id }}" class="task-link">
+              <div class="task-title">{{ task.title }}</div>
+              <div class="task-desc">{{ task.description|truncatewords:10 }}</div>
+            </a>
+          </div>
+          <div class="cell created">{{ task.created_at|date:"Y-m-d" }}</div>
+          <div class="cell due">{{ task.due_date }}</div>
+          <div class="cell user">{{ task.user }}</div>
+          <div class="cell status">✅</div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    <p>No tasks available.</p>
   {% endif %}
 </div>
 {% endblock %}

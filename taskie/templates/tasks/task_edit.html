@@ -1,9 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Редактировать задачу{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/task_edit.css' %}">
+{% endblock %}
+
+{% block content %}
 <div class="container">
     <h2>Редактировать задачу для пользователя {{ username }}</h2>
     
-    <form method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">Сохранить</button>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+                <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">&times;</button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="post" class="task-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_title">Название задачи:</label>
+            <input type="text" 
+                   id="id_title" 
+                   name="title" 
+                   value="{{ form.title.value|default_if_none:'' }}" 
+                   placeholder="Введите название задачи"
+                   required>
+            {% if form.title.errors %}
+                <div class="form-error">
+                    {% for error in form.title.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_description">Описание:</label>
+            <textarea id="id_description" 
+                      name="description" 
+                      rows="5" 
+                      placeholder="Введите описание задачи">{{ form.description.value|default_if_none:'' }}</textarea>
+            {% if form.description.errors %}
+                <div class="form-error">
+                    {% for error in form.description.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="id_due_date">Срок выполнения:</label>
+            <input type="date" 
+                   id="id_due_date" 
+                   name="due_date" 
+                   value="{{ form.due_date.value|date:'Y-m-d'|default_if_none:'' }}"
+                   required>
+            <span class="helptext">Введите дату в формате ДД.ММ.ГГГГ или выберите в календаре</span>
+            {% if form.due_date.errors %}
+                <div class="form-error">
+                    {% for error in form.due_date.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+                <input type="checkbox" 
+                       id="id_is_completed" 
+                       name="is_completed" 
+                       value="1"
+                       {% if form.is_completed.value or task.is_completed %}checked{% endif %}>
+                <span class="checkmark"></span>
+                Задача выполнена
+            </label>
+            {% if form.is_completed.errors %}
+                <div class="form-error">
+                    {% for error in form.is_completed.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            <a href="tasks/{{ task.id }}" class="btn btn-secondary">Отмена</a>
+        </div>
     </form>
-  </div>
+</div>
+{% endblock content %}

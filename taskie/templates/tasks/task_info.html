@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{task.title}}{% endblock %}
+{% block title %}{{ task.title }}{% endblock %}
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/task_info.css' %}">
 {% endblock %} 
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -19,6 +20,8 @@
         {% if task.created_at %}
         <div class="date">Создано: {{ task.created_at|date:"d.m.Y H:i" }}</div>
         {% endif %}
+
+        <a href="/tasks/{{ task.id }}/edit" class="edit-button">Редактировать</a>
     </div>
     {% endblock content %}
 </body>
