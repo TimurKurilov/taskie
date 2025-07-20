@@ -8,6 +8,7 @@ class Tasks(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     due_date = models.DateField()
     is_completed = models.BooleanField(default=False)
+    taken_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='taken_tasks')
 
     def __str__(self):
         return self.title

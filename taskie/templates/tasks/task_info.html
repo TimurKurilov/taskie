@@ -1,28 +1,31 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ task.title }}{% endblock %}
+{% block title %}{{ task.id }} - {{ task.title }}{% endblock %}
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/task_info.css' %}">
-{% endblock %} 
+<link rel="stylesheet" href="{% static 'css/task_info.css' %}">
+{% endblock %}
 
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-</head>
-<body>
-    {% block content %}
-    <div class="task-container">
-        <h1>{{ task.title }}</h1>
-        <p class="description">{{ task.description }}</p>
+{% block content %}
+<div class="task-container">
+    <h1>{{ task.title }}</h1>
+    <p class="description">{{ task.description }}</p>
 
-        {% if task.created_at %}
-        <div class="date">Создано: {{ task.created_at|date:"d.m.Y H:i" }}</div>
+    {% if request.user != task.user %}
+        {% if task.taken_by %}
+            <p class="taken-by">Эта задача уже взята: {{ task.taken_by.username }}</p>
+        {% else %}
+            <form method="post" action="take/">
+                {% csrf_token %}
+                <button type="submit">Взяться за задачу</button>
+            </form>
         {% endif %}
+    {% endif %}
 
-        <a href="/tasks/{{ task.id }}/edit" class="edit-button">Редактировать</a>
-    </div>
-    {% endblock content %}
-</body>
-</html>
+    {% if task.created_at %}
+    <div class="date">Создано: {{ task.created_at|date:"d.m.Y H:i" }}</div>
+    {% endif %}
+
+    <a href="/tasks/{{ task.id }}/edit" class="edit-button">Редактировать</a>
+</div>
+{% endblock %}

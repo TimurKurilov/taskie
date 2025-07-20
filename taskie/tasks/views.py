@@ -44,3 +44,10 @@ def task_edit(request, id):
         form = TasksForm(instance=task)
 
     return render(request, "tasks/task_edit.html", {"form": form, "task": task})
+
+def take_task(request,id):
+    task = get_object_or_404(Tasks, id=id)
+    if task.taken_by is None and request.user != task.user:
+        task.taken_by = request.user
+        task.save()
+    return redirect(f"/tasks/{id}", task_id=id)
