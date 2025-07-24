@@ -4,6 +4,7 @@ from .models import Tasks
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from django.views.decorators.cache import cache_page
 
 @login_required
 def task_create_view(request):
@@ -19,11 +20,12 @@ def task_create_view(request):
     
     return render(request, "tasks/create_task.html", {"form": form})
 
-
+@cache_page(60 * 1)
 def task_list(request):
     tasks = Tasks.objects.all().order_by("id")
     return render(request, "tasks/task_list.html", {"tasks": tasks})
 
+@cache_page(60*10)
 def task_info(request, id):
     task = get_object_or_404(Tasks, id=id)
     return render(request, "tasks/task_info.html", {"task": task})
