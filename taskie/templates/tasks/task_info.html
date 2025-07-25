@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ task.id }} - {{ task.title }}{% endblock %}
+{% block title %}{{ task.user }} - {{ task.title }}{% endblock %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/task_info.css' %}">
 {% endblock %}
@@ -9,6 +9,7 @@
 {% block content %}
 <div class="task-container">
     <h1>{{ task.title }}</h1>
+    <h2>{{ task.user }}
     <p class="description">{{ task.description }}</p>
 
     {% if request.user != task.user %}
@@ -25,7 +26,8 @@
     {% if task.created_at %}
     <div class="date">Создано: {{ task.created_at|date:"d.m.Y H:i" }}</div>
     {% endif %}
-
-    <a href="/tasks/{{ task.id }}/edit" class="edit-button">Редактировать</a>
+    {% if request.user == task.user %}
+        <a href="/tasks/{{ task.id }}/edit" class="edit-button">Редактировать</a>
+    {% endif %}
 </div>
 {% endblock %}

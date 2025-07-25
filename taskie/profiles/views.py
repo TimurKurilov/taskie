@@ -22,7 +22,7 @@ def edit_profile(request, username):
         if form.is_valid():
             form.save()
             messages.success(request, "Профиль успешно обновлен")
-            return redirect('profile', username=username)
+            return redirect(f'/profile/{username}/')
         else:
             messages.error(request, "Пожалуйста, исправьте ошибки в форме")
     else:
