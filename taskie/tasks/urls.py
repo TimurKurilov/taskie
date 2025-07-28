@@ -9,5 +9,6 @@ urlpatterns = [
     path("<int:id>/edit/", views.task_edit, name="task_edit"),
     path("<int:id>/", views.task_info, name="task_info"),
     path("<int:id>/take/", views.take_task, name='take_task'),
+    path('<int:id>/chat', views.chat, name="chat")
 
 ]

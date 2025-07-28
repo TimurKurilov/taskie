@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['web', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'tasks.apps.TasksConfig',
     'profiles.apps.ProfilesConfig',
     'users.apps.UsersConfig',
@@ -75,6 +76,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'taskie.wsgi.application'
+ASGI_APPLICATION = 'taskie.asgi.application'
 
 
 # Database
@@ -101,6 +103,14 @@ CACHES = {
     }
 }
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
+    },
+}
 
 
 

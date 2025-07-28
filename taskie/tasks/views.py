@@ -55,3 +55,7 @@ def take_task(request,id):
         task.taken_by = request.user
         task.save()
     return redirect(f"/tasks/{id}", task_id=id)
+
+
+def chat(request,id):
+    return render(request, 'tasks/task_chat.html', {"task_id": id})
