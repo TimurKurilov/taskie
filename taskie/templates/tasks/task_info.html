@@ -29,5 +29,8 @@
     {% if request.user == task.user %}
         <a href="/tasks/{{ task.id }}/edit" class="edit-button">Редактировать</a>
     {% endif %}
+    {% if request.user == task.taken_by.username or request.user == task.user %}
+        <a href="/tasks/{{ task.id }}/chat" class="edit-button">Чат</a>
+    {% endif %}
 </div>
 {% endblock %}

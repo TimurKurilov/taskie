@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import TasksForm
-from .models import Tasks
+from .models import Tasks, Messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.vary import vary_on_cookie
 from django.shortcuts import get_object_or_404
@@ -56,6 +56,6 @@ def take_task(request,id):
         task.save()
     return redirect(f"/tasks/{id}", task_id=id)
 
-
-def chat(request,id):
-    return render(request, 'tasks/task_chat.html', {"task_id": id})
+def chat(request, id):
+    messages = Messages.objects.all().filter(task=id)
+    return render(request, 'tasks/task_chat.html', {"messages": messages, "id": id})
