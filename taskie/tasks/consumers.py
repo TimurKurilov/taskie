@@ -8,6 +8,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.task_id = self.scope['url_route']['kwargs']['task_id']
         self.room_group_name = f'chat_{self.task_id}'
+        self.user = self.scope["user"]
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
@@ -17,16 +18,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )()
 
         if not message_exists:
-            await chathistory("Чат начался", self.task_id)
-
+            await chathistory("Чат начался", self.task_id, self.user.id)
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     'type': 'chat_message',
-                    'message': 'Чат начался'
+                    'message': 'Чат начался',
+                    'username': 'Система'
                 }
             )
-
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
@@ -36,17 +36,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = data['message']
         task_id = data.get('task_id', self.task_id)
 
-        await chathistory(message, task_id)
+        await chathistory(message, task_id, self.user.id)
 
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': message
+                'message': message,
+                'username': self.user.username
             }
         )
 
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
-            'message': event['message']
+            'message': event['message'],
+            'username': event['username']
         }))

@@ -16,6 +16,7 @@ class Tasks(models.Model):
 class Messages(models.Model):
     context = models.TextField()
     task = models.ForeignKey(Tasks, on_delete=models.CASCADE, related_name="messages")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     
     def __str__(self):
         return self.context
