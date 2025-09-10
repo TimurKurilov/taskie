@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['web', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     'channels',
+    'upload.apps.UploadConfig',
     'tasks.apps.TasksConfig',
     'profiles.apps.ProfilesConfig',
     'users.apps.UsersConfig',
