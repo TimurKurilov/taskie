@@ -24,8 +24,6 @@ def task_list(request):
     tasks = Tasks.objects.all().order_by("id")
     return render(request, "tasks/task_list.html", {"tasks": tasks})
 
-@vary_on_cookie
-@cache_page(60 * 10)
 def task_info(request, id):
     task = get_object_or_404(Tasks, id=id)
     return render(request, "tasks/task_info.html", {"task": task})
