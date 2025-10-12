@@ -8,5 +8,5 @@ django.setup()
 from tasks.models import Messages
 
 @database_sync_to_async
-def chathistory(message, task_id, user_id):
-    return Messages.objects.create(context=message, task_id=task_id, user_id=user_id)
+def chathistory(message, task_id, user):
+    return Messages.objects.create(context=message, task_id=task_id, user=user)

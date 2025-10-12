@@ -3,103 +3,134 @@
 
 {% block title %}Чат{% endblock %}
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/task_chat.css' %}">
+<link rel="stylesheet" href="{% static 'css/task_chat.css' %}">
 {% endblock %}
-{% block content %}
-<h2>Глобальный чат</h2>
 
-<div id="chat-log" style="border:1px solid #ccc; height:200px; overflow-y:auto; padding:10px;">
+{% block content %}
+<h2>Чат задачи</h2>
+
+<div id="chat-log" style="border:1px solid #ccc; height:300px; overflow-y:auto; padding:10px;">
   {% if messages %}
     {% for message in messages %}
-      <div><strong>{{ message.user.username }}:</strong> {{ message.context }}</div>
+      <div>
+        <strong>{{ message.user.username }}:</strong> {{ message.context }}
+        {% if message.file_url %}
+          {% if message.file_type == 'image' %}
+            <img src="{{ message.file_url }}" alt="{{ message.file_name }}" style="max-width:200px; border-radius:8px; margin-top:5px;"/>
+          {% elif message.file_type == 'video' %}
+            <video controls width="200" style="border-radius:8px; margin-top:5px;">
+              <source src="{{ message.file_url }}" type="video/mp4">
+            </video>
+          {% elif message.file_type == 'audio' %}
+            <audio controls style="width:100%; margin-top:5px;">
+              <source src="{{ message.file_url }}" type="audio/mpeg">
+            </audio>
+          {% else %}
+            <p>File: <a href="{{ message.file_url }}" target="_blank" rel="noopener noreferrer">{{ message.file_name }}</a></p>
+          {% endif %}
+        {% endif %}
+      </div>
     {% endfor %}
   {% else %}
     <p>Пока нет сообщений.</p>
   {% endif %}
 </div>
 
-<input id="chat-message-input" type="text" autocomplete="off" />
+<input id="chat-message-input" type="text" placeholder="Введите сообщение" autocomplete="off" />
 <input id="file-input" type="file" />
 <button onclick="sendMessage()">Отправить</button>
 
 <script>
-  const chatLog = document.getElementById('chat-log');
-  const taskId = "{{ id }}";
-  const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
-  const socket = new WebSocket(protocol + window.location.host + '/ws/chat/' + taskId + '/');
+const chatLog = document.getElementById('chat-log');
+const taskId = "{{ task_id }}";
+const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+const socket = new WebSocket(protocol + window.location.host + '/ws/chat/' + taskId + '/');
 
-
-  function addMessage(username, message) {
+function addMessage(username, message) {
     const div = document.createElement('div');
     div.innerHTML = `<strong>${username}:</strong> ${message}`;
     chatLog.appendChild(div);
     chatLog.scrollTop = chatLog.scrollHeight;
-  }
+}
 
-  function displayUploadedFile(fileUrl, fileName, fileType, username) {
-    const newMessageDiv = document.createElement('div');
+function displayUploadedFile(fileUrl, fileName, fileType, username) {
+    const div = document.createElement('div');
     let contentHtml = '';
 
     if (fileType === 'image') {
-      contentHtml = `<img src="${fileUrl}" alt="${fileName}" style="max-width:200px; border-radius:8px; margin-top:5px;"/>`;
+        contentHtml = `<img src="${fileUrl}" alt="${fileName}" style="max-width:200px; border-radius:8px; margin-top:5px;">`;
     } else if (fileType === 'video') {
-      contentHtml = `<video controls width="200" style="border-radius:8px; margin-top:5px;"><source src="${fileUrl}" type="video/mp4"></video>`;
+        contentHtml = `<video controls width="200" style="border-radius:8px; margin-top:5px;"><source src="${fileUrl}" type="video/mp4"></video>`;
     } else if (fileType === 'audio') {
-      contentHtml = `<audio controls style="width:100%; margin-top:5px;"><source src="${fileUrl}" type="audio/mpeg"></audio>`;
+        contentHtml = `<audio controls style="width:100%; margin-top:5px;"><source src="${fileUrl}" type="audio/mpeg"></audio>`;
     } else {
-      contentHtml = `<p>File: <a href="${fileUrl}" target="_blank" rel="noopener noreferrer">${fileName}</a></p>`;
+        contentHtml = `<p>File: <a href="${fileUrl}" target="_blank" rel="noopener noreferrer">${fileName}</a></p>`;
     }
 
-    newMessageDiv.innerHTML = `<strong>${username}:</strong> ${contentHtml}`;
-    chatLog.appendChild(newMessageDiv);
+    div.innerHTML = `<strong>${username}:</strong> ${contentHtml}`;
+    chatLog.appendChild(div);
     chatLog.scrollTop = chatLog.scrollHeight;
-  }
+}
 
-  socket.onmessage = function(e) {
+socket.onopen = () => console.log("WebSocket connected");
+
+socket.onmessage = function(e) {
     const data = JSON.parse(e.data);
-    if (data.message && data.username) {
-      addMessage(data.username, data.message);
-    }
-    if (data.file_url && data.file_name && data.file_type && data.username) {
-      displayUploadedFile(data.file_url, data.file_name, data.file_type, data.username);
-    }
-  };
 
-  async function sendMessage() {
+    if (data.message && data.username) {
+        addMessage(data.username, data.message);
+    }
+
+    if (data.file_url && data.file_name && data.file_type && data.username) {
+        displayUploadedFile(data.file_url, data.file_name, data.file_type, data.username);
+    }
+};
+
+socket.onclose = (event) => console.log("WebSocket closed:", event.code);
+
+async function sendMessage() {
     const input = document.getElementById('chat-message-input');
     const fileInput = document.getElementById('file-input');
-
     const message = input.value.trim();
     const file = fileInput.files[0];
 
+    if (socket.readyState !== WebSocket.OPEN) {
+        alert("Соединение ещё не установлено. Попробуйте чуть позже.");
+        return;
+    }
+
     if (message) {
-      socket.send(JSON.stringify({ message: message, task_id: taskId }));
-      input.value = '';
+        socket.send(JSON.stringify({ message: message }));
+        input.value = '';
     }
 
     if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('task_id', taskId);
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('task_id', taskId);
 
-      const response = await fetch('/upload/', {
-        method: 'POST',
-        body: formData
-      });
+        try {
+            const response = await fetch('/upload/', { method: 'POST', body: formData });
+            if (!response.ok) throw new Error('Ошибка загрузки файла!');
+            const result = await response.json();
 
-      if (response.ok) {
-        const result = await response.json();
-        socket.send(JSON.stringify({
-          file_url: result.file_url,
-          file_name: result.file_name,
-          file_type: result.file_type,
-          task_id: taskId
-        }));
-        fileInput.value = '';
-      } else {
-        alert('Ошибка загрузки файла!');
-      }
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    file_url: result.file_url,
+                    file_name: result.file_name,
+                    file_type: result.file_type
+                }));
+            }
+
+            fileInput.value = '';
+        } catch (err) {
+            alert(err.message);
+        }
     }
-  }
+}
+
+window.addEventListener("beforeunload", () => {
+    if (socket.readyState === WebSocket.OPEN) socket.close();
+});
 </script>
 {% endblock %}

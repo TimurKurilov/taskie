@@ -1,5 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from .history import chathistory
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -12,20 +13,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
         await self.accept()
 
-        if not hasattr(self.channel_layer, f'chat_started_{self.task_id}'):
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    "type": "chat_message",
-                    "message": "Чат начался!",
-                    "username": "Система",
-                    "file_url": None,
-                    "file_name": None,
-                    "file_type": None,
-                }
-            )
-            setattr(self.channel_layer, f'chat_started_{self.task_id}', True)
-
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
             self.room_group_name,
@@ -33,28 +20,40 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
+        try:
+            data = json.loads(text_data)
+            message = data.get("message")
+            file_url = data.get("file_url")
+            file_name = data.get("file_name")
+            file_type = data.get("file_type")
 
-        message = data.get("message")
-        username = self.scope["user"].username if self.scope["user"].is_authenticated else "Аноним"
-        file_url = data.get("file_url")
-        file_name = data.get("file_name")
-        file_type = data.get("file_type")
+            user = self.scope["user"] if self.scope["user"].is_authenticated else None
+            username = self.scope["user"].username if self.scope["user"].is_authenticated else "Аноним"
 
-        if not message and not file_url:
-            return
+            if not message and not file_url:
+                return
 
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                "type": "chat_message",
-                "message": message,
-                "username": username,
-                "file_url": file_url,
-                "file_name": file_name,
-                "file_type": file_type,
-            }
-        )
+            if message:
+                await chathistory(message, self.task_id, user)
+
+            if file_url:
+                file_message = f"[Файл: {file_name}]"
+                await chathistory(file_message, self.task_id, user)
+
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "chat_message",
+                    "message": message,
+                    "username": username,
+                    "file_url": file_url,
+                    "file_name": file_name,
+                    "file_type": file_type,
+                }
+            )
+
+        except Exception as e:
+            print(f"Error in receive: {e}")
 
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({

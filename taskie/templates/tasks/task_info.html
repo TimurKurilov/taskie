@@ -9,27 +9,39 @@
 {% block content %}
 <div class="task-container">
     <h1>{{ task.title }}</h1>
-    <h2>{{ task.user }}
+    <h2>{{ task.user }}</h2>
     <p class="description">{{ task.description }}</p>
 
-    {% if request.user != task.user %}
-        {% if task.taken_by %}
-            <p class="taken-by">Эта задача уже взята: {{ task.taken_by.username }}</p>
-        {% else %}
-            <form method="post" action="take/">
+    {% if task.is_completed %}
+        <p class="status completed">✅ Задача завершена</p>
+    {% else %}
+        {% if request.user != task.user %}
+            {% if task.taken_by %}
+                <p class="taken-by">Эта задача уже взята: {{ task.taken_by.username }}</p>
+            {% else %}
+                <form method="post" action="take/">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-take">Взяться за задачу</button>
+                </form>
+            {% endif %}
+        {% endif %}
+
+        {% if request.user == task.taken_by or request.user == task.user %}
+            <form method="post" action="end/" class="end-form">
                 {% csrf_token %}
-                <button type="submit">Взяться за задачу</button>
+                <button type="submit" class="btn-end">Завершить задачу</button>
             </form>
         {% endif %}
     {% endif %}
 
     {% if task.created_at %}
-    <div class="date">Создано: {{ task.created_at|date:"d.m.Y H:i" }}</div>
+        <div class="date">Создано: {{ task.created_at|date:"d.m.Y H:i" }}</div>
     {% endif %}
+    <div class="due-date">Срок: {{ task.due_date|date:"d.m.Y" }}</div>
     {% if request.user == task.user %}
         <a href="/tasks/{{ task.id }}/edit" class="edit-button">Редактировать</a>
     {% endif %}
-    {% if request.user == task.taken_by.username or request.user == task.user %}
+    {% if request.user == task.taken_by or request.user == task.user %}
         <a href="/tasks/{{ task.id }}/chat" class="edit-button">Чат</a>
     {% endif %}
 </div>
