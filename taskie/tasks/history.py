@@ -9,4 +9,4 @@ from tasks.models import Messages
 
 @database_sync_to_async
 def chathistory(message, task_id, user):
-    return Messages.objects.create(context=message, task_id=task_id, user=user)
+    return Messages.objects.create(context=message, task_id=task_id, user_id=user)

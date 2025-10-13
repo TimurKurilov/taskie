@@ -99,10 +99,11 @@ async function sendMessage() {
         return;
     }
 
-    if (message) {
-        socket.send(JSON.stringify({ message: message }));
-        input.value = '';
+    if (!message && !file) {
+        return;
     }
+
+    let fileData = {};
 
     if (file) {
         const formData = new FormData();
@@ -113,19 +114,24 @@ async function sendMessage() {
             const response = await fetch('/upload/', { method: 'POST', body: formData });
             if (!response.ok) throw new Error('Ошибка загрузки файла!');
             const result = await response.json();
-
-            if (socket.readyState === WebSocket.OPEN) {
-                socket.send(JSON.stringify({
-                    file_url: result.file_url,
-                    file_name: result.file_name,
-                    file_type: result.file_type
-                }));
-            }
-
-            fileInput.value = '';
+            fileData = {
+                file_url: result.file_url,
+                file_name: result.file_name,
+                file_type: result.file_type
+            };
         } catch (err) {
             alert(err.message);
+            return;
         }
+    }
+
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+            message: message,
+            ...fileData
+        }));
+        input.value = '';
+        fileInput.value = '';
     }
 }
 

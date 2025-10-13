@@ -16,6 +16,8 @@ services:
   web:
     build: .
     restart: always
+    environment:
+      - DJANGO_SETTINGS_MODULE=taskie.settings
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/

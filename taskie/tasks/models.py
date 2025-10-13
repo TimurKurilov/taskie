@@ -18,7 +18,7 @@ class Tasks(models.Model):
 class Messages(models.Model):
     task = models.ForeignKey(Tasks, on_delete=models.CASCADE, related_name="messages")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    сontext = models.TextField(blank=True, null=True)
+    context = models.TextField(blank=True, null=True)
     uploaded_file = models.ForeignKey(UploadModel, on_delete=models.SET_NULL, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
 
