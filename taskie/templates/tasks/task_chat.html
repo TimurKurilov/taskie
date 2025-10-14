@@ -13,21 +13,25 @@
   {% if messages %}
     {% for message in messages %}
       <div>
-        <strong>{{ message.user.username }}:</strong> {{ message.context }}
-        {% if message.file_url %}
-          {% if message.file_type == 'image' %}
-            <img src="{{ message.file_url }}" alt="{{ message.file_name }}" style="max-width:200px; border-radius:8px; margin-top:5px;"/>
-          {% elif message.file_type == 'video' %}
-            <video controls width="200" style="border-radius:8px; margin-top:5px;">
-              <source src="{{ message.file_url }}" type="video/mp4">
-            </video>
-          {% elif message.file_type == 'audio' %}
-            <audio controls style="width:100%; margin-top:5px;">
-              <source src="{{ message.file_url }}" type="audio/mpeg">
-            </audio>
-          {% else %}
-            <p>File: <a href="{{ message.file_url }}" target="_blank" rel="noopener noreferrer">{{ message.file_name }}</a></p>
-          {% endif %}
+        <strong>{{ message.user.username }}:</strong>
+        {% if '/media/' in message.context %}
+          {% with file_url=message.context %}
+            {% if file_url|lower|slice:"-4:" == ".jpg" or file_url|lower|slice:"-5:" == ".jpeg" or file_url|lower|slice:"-4:" == ".png" or file_url|lower|slice:"-5:" == ".webp" %}
+              <img src="{{ file_url }}" alt="image" style="max-width:200px;border-radius:8px;margin-top:5px;">
+            {% elif file_url|lower|slice:"-4:" == ".mp4" or file_url|lower|slice:"-5:" == ".webm" %}
+              <video controls width="200" style="border-radius:8px;margin-top:5px;">
+                <source src="{{ file_url }}" type="video/mp4">
+              </video>
+            {% elif file_url|lower|slice:"-4:" == ".mp3" or file_url|lower|slice:"-4:" == ".wav" %}
+              <audio controls style="width:100%;margin-top:5px;">
+                <source src="{{ file_url }}" type="audio/mpeg">
+              </audio>
+            {% else %}
+              <a href="{{ file_url }}" target="_blank">{{ file_url }}</a>
+            {% endif %}
+          {% endwith %}
+        {% else %}
+          {{ message.context }}
         {% endif %}
       </div>
     {% endfor %}
@@ -48,26 +52,26 @@ const socket = new WebSocket(protocol + window.location.host + '/ws/chat/' + tas
 
 function addMessage(username, message) {
     const div = document.createElement('div');
-    div.innerHTML = `<strong>${username}:</strong> ${message}`;
-    chatLog.appendChild(div);
-    chatLog.scrollTop = chatLog.scrollHeight;
-}
 
-function displayUploadedFile(fileUrl, fileName, fileType, username) {
-    const div = document.createElement('div');
-    let contentHtml = '';
+    if (message.startsWith('/media/')) {
+        const ext = message.split('.').pop().toLowerCase();
+        let content = '';
 
-    if (fileType === 'image') {
-        contentHtml = `<img src="${fileUrl}" alt="${fileName}" style="max-width:200px; border-radius:8px; margin-top:5px;">`;
-    } else if (fileType === 'video') {
-        contentHtml = `<video controls width="200" style="border-radius:8px; margin-top:5px;"><source src="${fileUrl}" type="video/mp4"></video>`;
-    } else if (fileType === 'audio') {
-        contentHtml = `<audio controls style="width:100%; margin-top:5px;"><source src="${fileUrl}" type="audio/mpeg"></audio>`;
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+            content = `<img src="${message}" style="max-width:200px;border-radius:8px;">`;
+        } else if (['mp4', 'webm', 'mov'].includes(ext)) {
+            content = `<video controls width="200"><source src="${message}" type="video/${ext}"></video>`;
+        } else if (['mp3', 'wav', 'ogg'].includes(ext)) {
+            content = `<audio controls><source src="${message}" type="audio/${ext}"></audio>`;
+        } else {
+            content = `<a href="${message}" target="_blank">${message}</a>`;
+        }
+
+        div.innerHTML = `<strong>${username}:</strong> ${content}`;
     } else {
-        contentHtml = `<p>File: <a href="${fileUrl}" target="_blank" rel="noopener noreferrer">${fileName}</a></p>`;
+        div.innerHTML = `<strong>${username}:</strong> ${message}`;
     }
 
-    div.innerHTML = `<strong>${username}:</strong> ${contentHtml}`;
     chatLog.appendChild(div);
     chatLog.scrollTop = chatLog.scrollHeight;
 }
@@ -76,13 +80,12 @@ socket.onopen = () => console.log("WebSocket connected");
 
 socket.onmessage = function(e) {
     const data = JSON.parse(e.data);
-
-    if (data.message && data.username) {
-        addMessage(data.username, data.message);
-    }
-
-    if (data.file_url && data.file_name && data.file_type && data.username) {
-        displayUploadedFile(data.file_url, data.file_name, data.file_type, data.username);
+    if (data.username) {
+        if (data.message) {
+            addMessage(data.username, data.message);
+        } else if (data.file_url) {
+            addMessage(data.username, data.file_url);
+        }
     }
 };
 
@@ -125,14 +128,13 @@ async function sendMessage() {
         }
     }
 
-    if (socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({
-            message: message,
-            ...fileData
-        }));
-        input.value = '';
-        fileInput.value = '';
-    }
+    socket.send(JSON.stringify({
+        message: message,
+        ...fileData
+    }));
+
+    input.value = '';
+    fileInput.value = '';
 }
 
 window.addEventListener("beforeunload", () => {

@@ -4,6 +4,7 @@ from asgiref.sync import sync_to_async
 from tasks.models import Messages
 from .history import chathistory
 
+
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.user = self.scope["user"]
@@ -16,7 +17,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message_exists = await sync_to_async(
             lambda: Messages.objects.filter(task_id=self.task_id, context="Чат начался").exists()
         )()
-
+        
         if not message_exists:
             await chathistory("Чат начался", self.task_id, self.user.id)
             await self.channel_layer.group_send(
@@ -46,7 +47,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         username = self.user.username if self.user.is_authenticated else "Аноним"
 
-        await chathistory(message or "[Файл]", self.task_id, self.user.id)
+        content_to_save = message if message else file_url or "[Файл]"
+        await chathistory(content_to_save, self.task_id, self.user.id)
+
         await self.channel_layer.group_send(
             self.room_group_name,
             {
