@@ -51,12 +51,13 @@ def take_task(request,id):
     task = get_object_or_404(Tasks, id=id)
     if task.taken_by is None and request.user != task.user:
         task.taken_by = request.user
+        task.in_pending = True
         task.save()
     return redirect(f"/tasks/{id}", task_id=id)
 
 def end_task(request,id):
     task = get_object_or_404(Tasks, id=id)
-    if task.taken_by is not None and (request.user == task.taken_by.username or request.user == task.user) and task.is_completed == False:
+    if task.taken_by is not None and request.user == task.user and task.is_completed == False:
         task.is_completed = True
         task.save()
     return redirect(f"/tasks/{id}", task_id=id)

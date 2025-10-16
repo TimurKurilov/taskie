@@ -30,7 +30,11 @@
           <div class="cell created">{{ task.created_at|date:"Y-m-d" }}</div>
           <div class="cell due">{{ task.due_date }}</div>
           <div class="cell user">{{ task.user }}</div>
+          {% if task.in_pending %}
+            <p class="cell status">♾️</p>
+          {% else %}
           <div class="cell status">❌</div>
+          {%endif %}
         </div>
       {% endif %}
     {% endfor %}

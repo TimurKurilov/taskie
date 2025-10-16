@@ -26,7 +26,7 @@
             {% endif %}
         {% endif %}
 
-        {% if request.user == task.taken_by or request.user == task.user %}
+        {% if request.user == task.user %}
             <form method="post" action="end/" class="end-form">
                 {% csrf_token %}
                 <button type="submit" class="btn-end">Завершить задачу</button>
