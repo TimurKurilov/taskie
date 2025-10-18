@@ -3,21 +3,36 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.views import View
 from .models import UploadModel
+from . import mime_types
 import mimetypes
 
 @method_decorator(csrf_exempt, name='dispatch')
 class FileUploadView(View):
+    ALLOWED_EXTENSIONS = {
+        'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp',
+        'mp4', 'avi', 'mov', 'webm',
+        'mp3', 'wav', 'ogg',
+        'txt', 'pdf', 'docx', 'xlsx',
+        'zip', 'rar'
+    }
+    
     def post(self, request, *args, **kwargs):
         upload = request.FILES.get("file")
         if not upload:
             return JsonResponse({"error": "Нет файла"}, status=400)
+        ext = upload.name.split('.')[-1].lower() if '.' in upload.name else ''
+        if ext not in self.ALLOWED_EXTENSIONS:
+            return JsonResponse({
+                "error": f"Неподдерживаемый формат файла: .{ext}",
+                "allowed": list(self.ALLOWED_EXTENSIONS)
+            }, status=400)
 
         obj = UploadModel.objects.create(
             name=upload.name,
             file=upload
         )
 
-        mime, _ = mimetypes.guess_type(obj.file.url)
+        mime, _ = mimetypes.guess_type(obj.file.name)
         if mime:
             if mime.startswith("image/"):
                 file_type = "image"

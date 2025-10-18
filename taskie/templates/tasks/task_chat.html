@@ -16,16 +16,24 @@
         <strong>{{ message.user.username }}:</strong>
         {% if '/media/' in message.context %}
           {% with file_url=message.context %}
-            {% if file_url|lower|slice:"-4:" == ".jpg" or file_url|lower|slice:"-5:" == ".jpeg" or file_url|lower|slice:"-4:" == ".png" or file_url|lower|slice:"-5:" == ".webp" %}
+            {% if file_url|lower|slice:"-4:" == ".jpg" or file_url|lower|slice:"-5:" == ".jpeg" or file_url|lower|slice:"-4:" == ".png" or file_url|lower|slice:"-5:" == ".webp" or file_url|lower|slice:"-4:" == ".gif" or file_url|lower|slice:"-4:" == ".bmp" %}
               <img src="{{ file_url }}" alt="image" style="max-width:200px;border-radius:8px;margin-top:5px;">
-            {% elif file_url|lower|slice:"-4:" == ".mp4" or file_url|lower|slice:"-5:" == ".webm" %}
+            {% elif file_url|lower|slice:"-4:" == ".mp4" or file_url|lower|slice:"-5:" == ".webm" or file_url|lower|slice:"-4:" == ".avi" or file_url|lower|slice:"-4:" == ".mov" %}
               <video controls width="200" style="border-radius:8px;margin-top:5px;">
-                <source src="{{ file_url }}" type="video/mp4">
+                <source src="{{ file_url }}">
               </video>
-            {% elif file_url|lower|slice:"-4:" == ".mp3" or file_url|lower|slice:"-4:" == ".wav" %}
+            {% elif file_url|lower|slice:"-4:" == ".mp3" or file_url|lower|slice:"-4:" == ".wav" or file_url|lower|slice:"-4:" == ".ogg" %}
               <audio controls style="width:100%;margin-top:5px;">
-                <source src="{{ file_url }}" type="audio/mpeg">
+                <source src="{{ file_url }}">
               </audio>
+            {% elif file_url|lower|slice:"-4:" == ".pdf" %}
+              <a href="{{ file_url }}" target="_blank">📄 {{ file_url|slice:"7:" }}</a>
+            {% elif file_url|lower|slice:"-5:" == ".docx" %}
+              <a href="{{ file_url }}" target="_blank">📝 {{ file_url|slice:"7:" }}</a>
+            {% elif file_url|lower|slice:"-5:" == ".xlsx" %}
+              <a href="{{ file_url }}" target="_blank">📊 {{ file_url|slice:"7:" }}</a>
+            {% elif file_url|lower|slice:"-4:" == ".zip" or file_url|lower|slice:"-4:" == ".rar" %}
+              <a href="{{ file_url }}" target="_blank">📦 {{ file_url|slice:"7:" }}</a>
             {% else %}
               <a href="{{ file_url }}" target="_blank">{{ file_url }}</a>
             {% endif %}
@@ -41,7 +49,7 @@
 </div>
 
 <input id="chat-message-input" type="text" placeholder="Введите сообщение" autocomplete="off" />
-<input id="file-input" type="file" />
+<input id="file-input" type="file" accept=".jpg,.jpeg,.png,.gif,.bmp,.webp,.mp4,.avi,.mov,.webm,.mp3,.wav,.ogg,.txt,.pdf,.docx,.xlsx,.zip,.rar" />
 <button onclick="sendMessage()">Отправить</button>
 
 <script>
@@ -57,14 +65,24 @@ function addMessage(username, message) {
         const ext = message.split('.').pop().toLowerCase();
         let content = '';
 
-        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
-            content = `<img src="${message}" style="max-width:200px;border-radius:8px;">`;
-        } else if (['mp4', 'webm', 'mov'].includes(ext)) {
-            content = `<video controls width="200"><source src="${message}" type="video/${ext}"></video>`;
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext)) {
+            content = `<img src="${message}" style="max-width:200px;border-radius:8px;margin-top:5px;">`;
+        } else if (['mp4', 'webm', 'mov', 'avi'].includes(ext)) {
+            content = `<video controls width="200" style="border-radius:8px;margin-top:5px;"><source src="${message}"></video>`;
         } else if (['mp3', 'wav', 'ogg'].includes(ext)) {
-            content = `<audio controls><source src="${message}" type="audio/${ext}"></audio>`;
+            content = `<audio controls style="width:100%;margin-top:5px;"><source src="${message}"></audio>`;
+        } else if (ext === 'pdf') {
+            content = `<a href="${message}" target="_blank">📄 ${message.split('/').pop()}</a>`;
+        } else if (ext === 'docx') {
+            content = `<a href="${message}" target="_blank">📝 ${message.split('/').pop()}</a>`;
+        } else if (ext === 'xlsx') {
+            content = `<a href="${message}" target="_blank">📊 ${message.split('/').pop()}</a>`;
+        } else if (['zip', 'rar'].includes(ext)) {
+            content = `<a href="${message}" target="_blank">📦 ${message.split('/').pop()}</a>`;
+        } else if (ext === 'txt') {
+            content = `<a href="${message}" target="_blank">📃 ${message.split('/').pop()}</a>`;
         } else {
-            content = `<a href="${message}" target="_blank">${message}</a>`;
+            content = `<a href="${message}" target="_blank">${message.split('/').pop()}</a>`;
         }
 
         div.innerHTML = `<strong>${username}:</strong> ${content}`;
@@ -76,37 +94,52 @@ function addMessage(username, message) {
     chatLog.scrollTop = chatLog.scrollHeight;
 }
 
-socket.onopen = () => console.log("WebSocket connected");
+socket.onopen = () => {
+    console.log("WebSocket connected");
+};
 
 socket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
-    if (data.username) {
+    try {
+        const data = JSON.parse(e.data);
+        
+        if (!data.username) {
+            console.warn('Получено сообщение без username:', data);
+            return;
+        }
         if (data.message) {
             addMessage(data.username, data.message);
         } else if (data.file_url) {
             addMessage(data.username, data.file_url);
         }
+    } catch (error) {
+        console.error('Ошибка парсинга JSON:', error);
+        console.error('Полученные данные:', e.data);
     }
 };
 
-socket.onclose = (event) => console.log("WebSocket closed:", event.code);
+socket.onerror = function(error) {
+    console.error('WebSocket error:', error);
+};
 
+socket.onclose = function(event) {
+    console.log("WebSocket closed:", event.code, event.reason);
+    if (event.code !== 1000) {
+        console.error('WebSocket закрыт с ошибкой');
+    }
+};
 async function sendMessage() {
     const input = document.getElementById('chat-message-input');
     const fileInput = document.getElementById('file-input');
     const message = input.value.trim();
     const file = fileInput.files[0];
-
     if (socket.readyState !== WebSocket.OPEN) {
         alert("Соединение ещё не установлено. Попробуйте чуть позже.");
         return;
     }
-
     if (!message && !file) {
         return;
     }
-
-    let fileData = {};
+    const payload = {};
 
     if (file) {
         const formData = new FormData();
@@ -115,27 +148,35 @@ async function sendMessage() {
 
         try {
             const response = await fetch('/upload/', { method: 'POST', body: formData });
-            if (!response.ok) throw new Error('Ошибка загрузки файла!');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Ошибка загрузки файла!');
+            }
             const result = await response.json();
-            fileData = {
-                file_url: result.file_url,
-                file_name: result.file_name,
-                file_type: result.file_type
-            };
+            payload.file_url = result.file_url;
+            payload.file_name = result.file_name;
+            payload.file_type = result.file_type;
         } catch (err) {
             alert(err.message);
             return;
         }
     }
 
-    socket.send(JSON.stringify({
-        message: message,
-        ...fileData
-    }));
+    if (message) {
+        payload.message = message;
+    }
+
+    socket.send(JSON.stringify(payload));
 
     input.value = '';
     fileInput.value = '';
 }
+
+document.getElementById('chat-message-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
 
 window.addEventListener("beforeunload", () => {
     if (socket.readyState === WebSocket.OPEN) socket.close();
