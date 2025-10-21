@@ -20,6 +20,7 @@ def task_create_view(request):
     
     return render(request, "tasks/create_task.html", {"form": form})
 
+    
 def task_list(request):
     tasks = Tasks.objects.all().order_by("id")
     return render(request, "tasks/task_list.html", {"tasks": tasks})
@@ -46,6 +47,13 @@ def task_edit(request, id):
         form = TasksForm(instance=task)
 
     return render(request, "tasks/task_edit.html", {"form": form, "task": task})
+
+def task_delete(request, id):
+    task = get_object_or_404(Tasks, id=id)
+    if task.user != request.user:
+        return redirect("/tasks/")
+    task.delete()
+    return redirect("/tasks/")
 
 def take_task(request,id):
     task = get_object_or_404(Tasks, id=id)

@@ -10,6 +10,7 @@ urlpatterns = [
     path("<int:id>/", views.task_info, name="task_info"),
     path("<int:id>/take/", views.take_task, name='take_task'),
     path("<int:id>/end/", views.end_task, name='end_task'),
+    path("<int:id>/delete/", views.task_delete, name='task_delete'),
     path('<int:id>/chat', views.chat, name="chat")
 
 ]
