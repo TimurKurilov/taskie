@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import logout
 
 def profile(request, username):
     user = User.objects.get(username=username)
@@ -32,3 +33,7 @@ def edit_profile(request, username):
         "form": form, 
         "username": username
     })
+    
+def logout_view(request):
+    logout(request)
+    return redirect("/")

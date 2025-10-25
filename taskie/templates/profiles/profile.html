@@ -12,6 +12,7 @@
     <p>{{ user_profile.bio|linebreaks }}</p>
     {% if user == request.user %}
         <a href="/profile/{{user.username}}/edit/">Редактировать профиль</a>
+        <a href="/profile/logout/">Выйти из аккаунта</a>
     {% endif %}
     {% endblock content %}
 </div>
